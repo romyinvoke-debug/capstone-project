@@ -1,0 +1,28 @@
+{
+  "name": "capstone-simetri",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.116.0",
+    "bcryptjs": "^3.0.3",
+    "drizzle-orm": "^0.44.7",
+    "next": "14.2.33",
+    "next-auth": "^4.24.13",
+    "pg": "^8.16.3",
+    "react": "^18",
+    "react-dom": "^18"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.6",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.33",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1"
+  }
+}

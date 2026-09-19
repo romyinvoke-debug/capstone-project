@@ -1,0 +1,11 @@
+// File: drizzle.config.js
+import 'dotenv/config';
+
+export default {
+  schema: './lib/db/schema.js',
+  out: './drizzle',
+  driver: 'pg',
+  dbCredentials: {
+    connectionString: process.env.DATABASE_URL,
+  },
+};
