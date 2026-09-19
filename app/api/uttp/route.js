@@ -1,6 +1,6 @@
 // File: app/api/uttp/route.js
 import { db } from '@/lib/db';
-import { dataUttp } from '@/lib/db/schema';
+import { dataUttp, activityLog } from '@/lib/db/schema';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { NextResponse } from 'next/server';
@@ -161,6 +161,22 @@ export async function POST(req) {
             }).returning();
 
             savedUttps.push(newUttp[0]);
+
+            // Catat log aktivitas CREATE
+            await db.insert(activityLog).values({
+                userId: parseInt(session.user.id),
+                userName: session.user.namaLengkap || session.user.username,
+                action: 'CREATE',
+                targetTable: 'data_uttp',
+                targetId: newUttp[0].id,
+                targetSummary: JSON.stringify({
+                    namaPemilik: namaPemilik,
+                    jenisUttp: detail.jenis_uttp,
+                    merek: detail.merek,
+                    noSeri: detail.no_seri
+                }),
+                ipAddress: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || '',
+            });
         }
 
         return NextResponse.json({
@@ -171,6 +187,78 @@ export async function POST(req) {
 
     } catch (error) {
         console.error('[UTTP_POST_ERROR]', error);
+        return new NextResponse('Internal Server Error', { status: 500 });
+    }
+}
+
+// DELETE: Hapus data UTTP (Hanya Admin)
+export async function DELETE(req) {
+    try {
+        const session = await getServerSession(authOptions);
+        if (!session) {
+            return new NextResponse('Unauthorized', { status: 401 });
+        }
+
+        if (session.user.role !== 'admin') {
+            return new NextResponse('Forbidden: Hanya admin yang dapat menghapus data', { status: 403 });
+        }
+
+        const { searchParams } = new URL(req.url);
+        const id = parseInt(searchParams.get('id'));
+
+        if (!id) {
+            return new NextResponse('ID tidak ditemukan', { status: 400 });
+        }
+
+        // Ambil data sebelum dihapus untuk log
+        const existingData = await db.query.dataUttp.findFirst({
+            where: (dataUttp, { eq }) => eq(dataUttp.id, id)
+        });
+
+        if (!existingData) {
+            return new NextResponse('Data tidak ditemukan', { status: 404 });
+        }
+
+        // Hapus foto dari Supabase Storage jika ada
+        if (existingData.fotoAlatUrl) {
+            try {
+                const urlParts = existingData.fotoAlatUrl.split('/');
+                const filename = urlParts[urlParts.length - 1];
+                if (filename) {
+                    await supabase.storage.from('foto-alat').remove([`uttp/${filename}`]);
+                }
+            } catch (err) {
+                console.error('[DELETE_FOTO_ERROR]', err);
+            }
+        }
+
+        // Hapus record dari database
+        await db.delete(dataUttp).where(sql`id = ${id}`);
+
+        // Catat log aktivitas DELETE
+        await db.insert(activityLog).values({
+            userId: parseInt(session.user.id),
+            userName: session.user.namaLengkap || session.user.email,
+            action: 'DELETE',
+            targetTable: 'data_uttp',
+            targetId: existingData.id,
+            targetSummary: JSON.stringify({
+                namaPemilik: existingData.namaPemilik,
+                jenisUttp: existingData.jenisUttp,
+                merek: existingData.merek,
+                noSeri: existingData.noSeri,
+                dihapusPada: new Date().toISOString()
+            }),
+            ipAddress: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || '',
+        });
+
+        return NextResponse.json({
+            success: true,
+            message: 'Data UTTP berhasil dihapus'
+        });
+
+    } catch (error) {
+        console.error('[UTTP_DELETE_ERROR]', error);
         return new NextResponse('Internal Server Error', { status: 500 });
     }
 }

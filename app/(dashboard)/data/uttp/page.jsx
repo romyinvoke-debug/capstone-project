@@ -29,6 +29,8 @@ export default function DataUttpPage() {
     const [pagination, setPagination] = useState({ total: 0, totalPages: 1 });
     const [selectedItem, setSelectedItem] = useState(null);
     const [showDetail, setShowDetail] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState(null);
+    const [isDeleting, setIsDeleting] = useState(false);
     const limit = 10;
 
     const fetchData = useCallback(async () => {
@@ -90,6 +92,31 @@ export default function DataUttpPage() {
     const closeDetail = () => {
         setShowDetail(false);
         setSelectedItem(null);
+    };
+
+    const confirmDelete = (item) => {
+        setItemToDelete(item);
+    };
+
+    const handleDelete = async () => {
+        if (!itemToDelete) return;
+        setIsDeleting(true);
+        try {
+            const response = await fetch(`/api/uttp?id=${itemToDelete.id}`, {
+                method: 'DELETE',
+            });
+            if (response.ok) {
+                setItemToDelete(null);
+                fetchData();
+            } else {
+                alert('Gagal menghapus data');
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Terjadi kesalahan saat menghapus data');
+        } finally {
+            setIsDeleting(false);
+        }
     };
 
     const formatDate = (dateStr) => {
@@ -269,12 +296,22 @@ export default function DataUttpPage() {
                                             </td>
                                             <td className="px-4 py-3 text-sm text-gray-600">{formatDate(item.tgl_tera)}</td>
                                             <td className="px-4 py-3 text-center">
-                                                <button
-                                                    onClick={() => openDetail(item)}
-                                                    className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors"
-                                                >
-                                                    <i className="fas fa-eye"></i>Detail
-                                                </button>
+                                                <div className="flex items-center justify-center gap-2">
+                                                    <button
+                                                        onClick={() => openDetail(item)}
+                                                        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors"
+                                                    >
+                                                        <i className="fas fa-eye"></i>Detail
+                                                    </button>
+                                                    {session?.user?.role === 'admin' && (
+                                                        <button
+                                                            onClick={() => confirmDelete(item)}
+                                                            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
+                                                        >
+                                                            <i className="fas fa-trash"></i>Hapus
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </td>
                                         </tr>
                                     ))}
@@ -301,12 +338,22 @@ export default function DataUttpPage() {
                                         <div><span className="font-medium text-gray-600">Merek:</span> {item.merek || '-'}</div>
                                         <div><span className="font-medium text-gray-600">Tgl Tera:</span> {formatDate(item.tgl_tera)}</div>
                                     </div>
-                                    <button
-                                        onClick={() => openDetail(item)}
-                                        className="w-full py-2 text-xs font-medium text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors"
-                                    >
-                                        <i className="fas fa-eye mr-1"></i>Lihat Detail
-                                    </button>
+                                    <div className="flex gap-2 mt-2">
+                                        <button
+                                            onClick={() => openDetail(item)}
+                                            className="flex-1 py-2 text-xs font-medium text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors flex items-center justify-center"
+                                        >
+                                            <i className="fas fa-eye mr-1"></i>Detail
+                                        </button>
+                                        {session?.user?.role === 'admin' && (
+                                            <button
+                                                onClick={() => confirmDelete(item)}
+                                                className="flex-1 py-2 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors flex items-center justify-center"
+                                            >
+                                                <i className="fas fa-trash mr-1"></i>Hapus
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -498,6 +545,37 @@ export default function DataUttpPage() {
                                     Diinput pada: {formatDate(selectedItem.created_at)}
                                 </p>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Delete Confirmation Modal */}
+            {itemToDelete && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center">
+                        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i className="fas fa-exclamation-triangle text-2xl text-red-600"></i>
+                        </div>
+                        <h3 className="text-lg font-bold text-gray-800 mb-2">Hapus Data?</h3>
+                        <p className="text-sm text-gray-500 mb-6">
+                            Anda yakin ingin menghapus data UTTP <b>{itemToDelete.nama_pemilik}</b>? Tindakan ini tidak dapat dibatalkan.
+                        </p>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setItemToDelete(null)}
+                                disabled={isDeleting}
+                                className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
+                            >
+                                Batal
+                            </button>
+                            <button
+                                onClick={handleDelete}
+                                disabled={isDeleting}
+                                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors disabled:opacity-50"
+                            >
+                                {isDeleting ? 'Menghapus...' : 'Ya, Hapus'}
+                            </button>
                         </div>
                     </div>
                 </div>

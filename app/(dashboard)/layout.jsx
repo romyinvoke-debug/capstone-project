@@ -39,6 +39,10 @@ export default function DashboardLayout({ children }) {
         { href: '/data/uttp', icon: 'fas fa-table', label: 'Lihat Data UTTP' },
     ];
 
+    if (session.user.role === 'admin') {
+        navItems.push({ href: '/riwayat', icon: 'fas fa-history', label: 'Riwayat Aktivitas' });
+    }
+
     const isActive = (href) => {
         if (href === '/') return pathname === '/';
         return pathname.startsWith(href);
