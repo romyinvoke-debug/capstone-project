@@ -1,8 +1,9 @@
 // File: app/(dashboard)/input/uttp/page.jsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 const KECAMATAN_LIST = [
     'Krayan', 'Krayan Barat', 'Krayan Selatan', 'Krayan Tengah', 'Krayan Timur',
@@ -34,7 +35,22 @@ const emptyUttpItem = {
 };
 
 export default function InputUttpPage() {
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (status === 'authenticated' && session?.user?.role !== 'admin') {
+            router.push('/data/uttp');
+        }
+    }, [status, session, router]);
+
+    if (status === 'loading' || (status === 'authenticated' && session?.user?.role !== 'admin')) {
+        return (
+            <div className="flex items-center justify-center min-h-[50vh]">
+                <i className="fas fa-spinner fa-spin text-3xl text-indigo-500"></i>
+            </div>
+        );
+    }
 
     // Owner data
     const [ownerData, setOwnerData] = useState({

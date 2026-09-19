@@ -281,20 +281,20 @@ export default function DataUttpPage() {
                                             </td>
                                             <td className="px-4 py-3">
                                                 <div>
-                                                    <p className="text-sm font-medium text-gray-800">{item.nama_pemilik || '-'}</p>
-                                                    <p className="text-xs text-gray-400">{item.email_pemilik || '-'}</p>
+                                                    <p className="text-sm font-medium text-gray-800">{item.namaPemilik || '-'}</p>
+                                                    <p className="text-xs text-gray-400">{item.emailPemilik || '-'}</p>
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-3 text-sm text-gray-600">{item.alamat_uttp || '-'}</td>
-                                            <td className="px-4 py-3 text-sm text-gray-600">{item.jenis_uttp || '-'}</td>
+                                            <td className="px-4 py-3 text-sm text-gray-600">{item.alamatUttp || '-'}</td>
+                                            <td className="px-4 py-3 text-sm text-gray-600">{item.jenisUttp || '-'}</td>
                                             <td className="px-4 py-3 text-sm text-gray-600">{item.merek || '-'}</td>
-                                            <td className="px-4 py-3 text-sm text-gray-600 font-mono">{item.no_seri || '-'}</td>
+                                            <td className="px-4 py-3 text-sm text-gray-600 font-mono">{item.noSeri || '-'}</td>
                                             <td className="px-4 py-3">
-                                                <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${getHasilTeraColor(item.hasil_tera)}`}>
-                                                    {item.hasil_tera || '-'}
+                                                <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${getHasilTeraColor(item.hasilTera)}`}>
+                                                    {item.hasilTera || '-'}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3 text-sm text-gray-600">{formatDate(item.tgl_tera)}</td>
+                                            <td className="px-4 py-3 text-sm text-gray-600">{formatDate(item.tglTera)}</td>
                                             <td className="px-4 py-3 text-center">
                                                 <div className="flex items-center justify-center gap-2">
                                                     <button
@@ -325,18 +325,18 @@ export default function DataUttpPage() {
                                 <div key={item.id} className="p-4 hover:bg-gray-50 transition-colors">
                                     <div className="flex items-start justify-between mb-2">
                                         <div>
-                                            <p className="text-sm font-semibold text-gray-800">{item.nama_pemilik || '-'}</p>
-                                            <p className="text-xs text-gray-400">{item.email_pemilik || '-'}</p>
+                                            <p className="text-sm font-semibold text-gray-800">{item.namaPemilik || '-'}</p>
+                                            <p className="text-xs text-gray-400">{item.emailPemilik || '-'}</p>
                                         </div>
-                                        <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${getHasilTeraColor(item.hasil_tera)}`}>
-                                            {item.hasil_tera || '-'}
+                                        <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${getHasilTeraColor(item.hasilTera)}`}>
+                                            {item.hasilTera || '-'}
                                         </span>
                                     </div>
                                     <div className="grid grid-cols-2 gap-2 text-xs text-gray-500 mb-3">
-                                        <div><span className="font-medium text-gray-600">Kecamatan:</span> {item.alamat_uttp || '-'}</div>
-                                        <div><span className="font-medium text-gray-600">Jenis:</span> {item.jenis_uttp || '-'}</div>
+                                        <div><span className="font-medium text-gray-600">Kecamatan:</span> {item.alamatUttp || '-'}</div>
+                                        <div><span className="font-medium text-gray-600">Jenis:</span> {item.jenisUttp || '-'}</div>
                                         <div><span className="font-medium text-gray-600">Merek:</span> {item.merek || '-'}</div>
-                                        <div><span className="font-medium text-gray-600">Tgl Tera:</span> {formatDate(item.tgl_tera)}</div>
+                                        <div><span className="font-medium text-gray-600">Tgl Tera:</span> {formatDate(item.tglTera)}</div>
                                     </div>
                                     <div className="flex gap-2 mt-2">
                                         <button
@@ -456,10 +456,10 @@ export default function DataUttpPage() {
                                     Informasi Pemilik
                                 </h4>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    <DetailField label="Nama Pemilik" value={selectedItem.nama_pemilik} />
-                                    <DetailField label="Email" value={selectedItem.email_pemilik} />
-                                    <DetailField label="No. Telepon" value={selectedItem.nomor_telepon} />
-                                    <DetailField label="Nama Pasar" value={selectedItem.nama_pasar} />
+                                    <DetailField label="Nama Pemilik" value={selectedItem.namaPemilik} />
+                                    <DetailField label="Email" value={selectedItem.emailPemilik} />
+                                    <DetailField label="No. Telepon" value={selectedItem.nomorTelepon} />
+                                    <DetailField label="Nama Pasar" value={selectedItem.namaPasar} />
                                 </div>
                             </div>
 
@@ -472,7 +472,7 @@ export default function DataUttpPage() {
                                     Lokasi
                                 </h4>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    <DetailField label="Kecamatan" value={selectedItem.alamat_uttp} />
+                                    <DetailField label="Kecamatan" value={selectedItem.alamatUttp} />
                                     <DetailField label="Latitude" value={selectedItem.latitude} />
                                     <DetailField label="Longitude" value={selectedItem.longitude} />
                                 </div>
@@ -487,16 +487,16 @@ export default function DataUttpPage() {
                                     Detail UTTP
                                 </h4>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    <DetailField label="Jenis UTTP" value={selectedItem.jenis_uttp} />
+                                    <DetailField label="Jenis UTTP" value={selectedItem.jenisUttp} />
                                     <DetailField label="Merek" value={selectedItem.merek} />
                                     <DetailField label="Tipe" value={selectedItem.tipe} />
                                     <DetailField label="Kapasitas" value={selectedItem.kapasitas} />
                                     <DetailField label="Kelas" value={selectedItem.kelas} />
-                                    <DetailField label="Daya Baca" value={selectedItem.daya_baca} />
+                                    <DetailField label="Daya Baca" value={selectedItem.dayaBaca} />
                                     <div className="sm:col-span-2">
                                         <p className="text-xs text-gray-500 mb-1">Hasil Tera</p>
-                                        <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${getHasilTeraColor(selectedItem.hasil_tera)}`}>
-                                            {selectedItem.hasil_tera || '-'}
+                                        <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${getHasilTeraColor(selectedItem.hasilTera)}`}>
+                                            {selectedItem.hasilTera || '-'}
                                         </span>
                                     </div>
                                 </div>
@@ -511,15 +511,15 @@ export default function DataUttpPage() {
                                     Informasi Tera
                                 </h4>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    <DetailField label="Tanggal Tera" value={formatDate(selectedItem.tgl_tera)} />
-                                    <DetailField label="Tanggal Habis Berlaku" value={formatDate(selectedItem.tgl_habis_berlaku)} />
-                                    <DetailField label="No. Seri" value={selectedItem.no_seri} />
-                                    <DetailField label="No. Order" value={selectedItem.no_order} />
+                                    <DetailField label="Tanggal Tera" value={formatDate(selectedItem.tglTera)} />
+                                    <DetailField label="Tanggal Habis Berlaku" value={formatDate(selectedItem.tglHabisBerlaku)} />
+                                    <DetailField label="No. Seri" value={selectedItem.noSeri} />
+                                    <DetailField label="No. Order" value={selectedItem.noOrder} />
                                 </div>
                             </div>
 
                             {/* Foto Alat */}
-                            {selectedItem.foto_alat_url && (
+                            {selectedItem.fotoAlatUrl && (
                                 <>
                                     <hr className="border-gray-200" />
                                     <div>
@@ -529,7 +529,7 @@ export default function DataUttpPage() {
                                         </h4>
                                         <div className="rounded-xl overflow-hidden border border-gray-200">
                                             <img
-                                                src={selectedItem.foto_alat_url}
+                                                src={selectedItem.fotoAlatUrl}
                                                 alt="Foto Alat UTTP"
                                                 className="w-full h-auto max-h-64 object-contain bg-gray-50"
                                             />
@@ -542,7 +542,7 @@ export default function DataUttpPage() {
                             <div className="text-center">
                                 <p className="text-xs text-gray-400">
                                     <i className="fas fa-clock mr-1"></i>
-                                    Diinput pada: {formatDate(selectedItem.created_at)}
+                                    Diinput pada: {formatDate(selectedItem.createdAt)}
                                 </p>
                             </div>
                         </div>
@@ -559,7 +559,7 @@ export default function DataUttpPage() {
                         </div>
                         <h3 className="text-lg font-bold text-gray-800 mb-2">Hapus Data?</h3>
                         <p className="text-sm text-gray-500 mb-6">
-                            Anda yakin ingin menghapus data UTTP <b>{itemToDelete.nama_pemilik}</b>? Tindakan ini tidak dapat dibatalkan.
+                            Anda yakin ingin menghapus data UTTP <b>{itemToDelete.namaPemilik}</b>? Tindakan ini tidak dapat dibatalkan.
                         </p>
                         <div className="flex gap-3">
                             <button

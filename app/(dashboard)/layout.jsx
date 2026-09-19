@@ -35,11 +35,11 @@ export default function DashboardLayout({ children }) {
 
     const navItems = [
         { href: '/', icon: 'fas fa-home', label: 'Dashboard' },
-        { href: '/input/uttp', icon: 'fas fa-plus-circle', label: 'Input Data UTTP' },
         { href: '/data/uttp', icon: 'fas fa-table', label: 'Lihat Data UTTP' },
     ];
 
     if (session.user.role === 'admin') {
+        navItems.splice(1, 0, { href: '/input/uttp', icon: 'fas fa-plus-circle', label: 'Input Data UTTP' });
         navItems.push({ href: '/riwayat', icon: 'fas fa-history', label: 'Riwayat Aktivitas' });
     }
 
