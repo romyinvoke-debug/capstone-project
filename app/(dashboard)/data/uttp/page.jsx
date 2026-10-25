@@ -31,6 +31,7 @@ export default function DataUttpPage() {
     const [showDetail, setShowDetail] = useState(false);
     const [itemToDelete, setItemToDelete] = useState(null);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [exportLoading, setExportLoading] = useState(false);
     const limit = 10;
 
     const fetchData = useCallback(async () => {
@@ -116,6 +117,34 @@ export default function DataUttpPage() {
             alert('Terjadi kesalahan saat menghapus data');
         } finally {
             setIsDeleting(false);
+        }
+    };
+
+    const handleExportExcel = async () => {
+        setExportLoading(true);
+        try {
+            const params = new URLSearchParams();
+            if (kecamatan) params.append('kecamatan', kecamatan);
+            if (jenisUttp) params.append('jenis_uttp', jenisUttp);
+
+            const response = await fetch(`/api/export/excel?${params.toString()}`);
+            if (!response.ok) throw new Error('Gagal mengekspor data');
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+            a.download = `Laporan_Rekapitulasi_UTTP_${today}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        } catch (err) {
+            console.error('Export error:', err);
+            alert('Gagal mengekspor data ke Excel');
+        } finally {
+            setExportLoading(false);
         }
     };
 
@@ -231,6 +260,18 @@ export default function DataUttpPage() {
                             <i className="fas fa-times mr-1"></i>Reset
                         </button>
                     )}
+                    {/* Export Excel Button */}
+                    <button
+                        onClick={handleExportExcel}
+                        disabled={exportLoading}
+                        className="px-4 py-2.5 text-sm text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors font-medium whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    >
+                        {exportLoading ? (
+                            <><i className="fas fa-spinner fa-spin"></i>Mengekspor...</>
+                        ) : (
+                            <><i className="fas fa-file-excel"></i>Export Excel</>
+                        )}
+                    </button>
                 </div>
             </div>
 
