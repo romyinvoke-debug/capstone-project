@@ -13,9 +13,19 @@ const KECAMATAN_LIST = [
 ];
 
 const JENIS_UTTP_LIST = [
-    'Timbangan', 'Anak Timbangan', 'Neraca', 'Dacin',
+    'Timbangan Pegas', 'Anak Timbangan', 'Neraca', 'Dacin',
     'Meter Taksi', 'Pompa Ukur BBM', 'Tangki Ukur',
     'Alat Ukur Panjang', 'Takaran', 'Meteran'
+];
+
+const currentYear = new Date().getFullYear();
+const TAHUN_LIST = [currentYear + 1, currentYear, currentYear - 1, currentYear - 2, currentYear - 3];
+
+const TRIWULAN_LIST = [
+    { value: 'Q1', label: 'Triwulan I (TW I)' },
+    { value: 'Q2', label: 'Triwulan II (TW II)' },
+    { value: 'Q3', label: 'Triwulan III (TW III)' },
+    { value: 'Q4', label: 'Triwulan IV (TW IV)' },
 ];
 
 export default function DataUttpPage() {
@@ -23,6 +33,8 @@ export default function DataUttpPage() {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
+    const [tahun, setTahun] = useState('');
+    const [triwulan, setTriwulan] = useState('');
     const [kecamatan, setKecamatan] = useState('');
     const [jenisUttp, setJenisUttp] = useState('');
     const [page, setPage] = useState(1);
@@ -42,6 +54,8 @@ export default function DataUttpPage() {
                 limit: limit.toString(),
             });
             if (search) params.append('search', search);
+            if (tahun) params.append('tahun', tahun);
+            if (triwulan) params.append('triwulan', triwulan);
             if (kecamatan) params.append('kecamatan', kecamatan);
             if (jenisUttp) params.append('jenis_uttp', jenisUttp);
 
@@ -56,7 +70,7 @@ export default function DataUttpPage() {
         } finally {
             setLoading(false);
         }
-    }, [page, search, kecamatan, jenisUttp]);
+    }, [page, search, tahun, triwulan, kecamatan, jenisUttp]);
 
     useEffect(() => {
         fetchData();
@@ -80,6 +94,8 @@ export default function DataUttpPage() {
     const resetFilters = () => {
         setSearchInput('');
         setSearch('');
+        setTahun('');
+        setTriwulan('');
         setKecamatan('');
         setJenisUttp('');
         setPage(1);
@@ -124,6 +140,8 @@ export default function DataUttpPage() {
         setExportLoading(true);
         try {
             const params = new URLSearchParams();
+            if (tahun) params.append('tahun', tahun);
+            if (triwulan) params.append('bulan', triwulan);
             if (kecamatan) params.append('kecamatan', kecamatan);
             if (jenisUttp) params.append('jenis_uttp', jenisUttp);
 
@@ -212,7 +230,7 @@ export default function DataUttpPage() {
                         <div>
                             <p className="text-sm text-gray-500">Filter Aktif</p>
                             <p className="text-xl font-bold text-gray-800">
-                                {[search, kecamatan, jenisUttp].filter(Boolean).length}
+                                {[search, tahun, triwulan, kecamatan, jenisUttp].filter(Boolean).length}
                             </p>
                         </div>
                     </div>
@@ -221,9 +239,9 @@ export default function DataUttpPage() {
 
             {/* Search & Filters */}
             <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm mb-6">
-                <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex flex-col sm:flex-row flex-wrap gap-3">
                     {/* Search Input */}
-                    <div className="flex-1 relative">
+                    <div className="flex-1 min-w-[200px] relative">
                         <i className="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
                         <input
                             type="text"
@@ -233,6 +251,24 @@ export default function DataUttpPage() {
                             className="w-full pl-9 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-sm text-gray-800"
                         />
                     </div>
+                    {/* Tahun Filter */}
+                    <select
+                        value={tahun}
+                        onChange={handleFilterChange(setTahun)}
+                        className="px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-sm text-gray-800 bg-white min-w-[130px]"
+                    >
+                        <option value="">Semua Tahun</option>
+                        {TAHUN_LIST.map(y => <option key={y} value={y}>{y}</option>)}
+                    </select>
+                    {/* Triwulan Filter */}
+                    <select
+                        value={triwulan}
+                        onChange={handleFilterChange(setTriwulan)}
+                        className="px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-sm text-gray-800 bg-white min-w-[150px]"
+                    >
+                        <option value="">Semua Triwulan</option>
+                        {TRIWULAN_LIST.map(tw => <option key={tw.value} value={tw.value}>{tw.label}</option>)}
+                    </select>
                     {/* Kecamatan Filter */}
                     <select
                         value={kecamatan}
@@ -252,7 +288,7 @@ export default function DataUttpPage() {
                         {JENIS_UTTP_LIST.map(j => <option key={j} value={j}>{j}</option>)}
                     </select>
                     {/* Reset Button */}
-                    {(search || kecamatan || jenisUttp) && (
+                    {(search || tahun || triwulan || kecamatan || jenisUttp) && (
                         <button
                             onClick={resetFilters}
                             className="px-4 py-2.5 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors font-medium whitespace-nowrap"
@@ -291,7 +327,7 @@ export default function DataUttpPage() {
                         </div>
                         <p className="text-gray-500 font-medium mb-1">Tidak ada data ditemukan</p>
                         <p className="text-gray-400 text-sm">
-                            {search || kecamatan || jenisUttp
+                            {search || tahun || triwulan || kecamatan || jenisUttp
                                 ? 'Coba ubah filter pencarian Anda'
                                 : 'Mulai dengan menginput data UTTP baru'}
                         </p>

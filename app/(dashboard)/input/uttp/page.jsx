@@ -14,7 +14,7 @@ const KECAMATAN_LIST = [
 ];
 
 const JENIS_UTTP_LIST = [
-    'Timbangan', 'Anak Timbangan', 'Neraca', 'Dacin',
+    'Timbangan Pegas', 'Anak Timbangan', 'Neraca', 'Dacin',
     'Meter Taksi', 'Pompa Ukur BBM', 'Tangki Ukur',
     'Alat Ukur Panjang', 'Takaran', 'Meteran'
 ];

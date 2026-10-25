@@ -21,6 +21,8 @@ export async function GET(req) {
         const search = searchParams.get('search') || '';
         const kecamatan = searchParams.get('kecamatan') || '';
         const jenisUttp = searchParams.get('jenis_uttp') || '';
+        const tahun = searchParams.get('tahun') || '';
+        const triwulan = searchParams.get('triwulan') || '';
         const offset = (page - 1) * limit;
 
         // Build conditions
@@ -43,6 +45,37 @@ export async function GET(req) {
         }
         if (jenisUttp) {
             conditions.push(ilike(dataUttp.jenisUttp, jenisUttp));
+        }
+        if (tahun) {
+            conditions.push(ilike(dataUttp.tglTera, `${tahun}-%`));
+        }
+        if (triwulan) {
+            const q = triwulan.toUpperCase();
+            if (q === 'Q1' || q === 'TW I') {
+                conditions.push(or(
+                    ilike(dataUttp.tglTera, '%-01-%'),
+                    ilike(dataUttp.tglTera, '%-02-%'),
+                    ilike(dataUttp.tglTera, '%-03-%')
+                ));
+            } else if (q === 'Q2' || q === 'TW II') {
+                conditions.push(or(
+                    ilike(dataUttp.tglTera, '%-04-%'),
+                    ilike(dataUttp.tglTera, '%-05-%'),
+                    ilike(dataUttp.tglTera, '%-06-%')
+                ));
+            } else if (q === 'Q3' || q === 'TW III') {
+                conditions.push(or(
+                    ilike(dataUttp.tglTera, '%-07-%'),
+                    ilike(dataUttp.tglTera, '%-08-%'),
+                    ilike(dataUttp.tglTera, '%-09-%')
+                ));
+            } else if (q === 'Q4' || q === 'TW IV') {
+                conditions.push(or(
+                    ilike(dataUttp.tglTera, '%-10-%'),
+                    ilike(dataUttp.tglTera, '%-11-%'),
+                    ilike(dataUttp.tglTera, '%-12-%')
+                ));
+            }
         }
 
         // Query with conditions

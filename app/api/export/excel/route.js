@@ -75,7 +75,7 @@ function applyDataRowBorder(row) {
             bottom: { style: 'thin' },
             right: { style: 'thin' },
         };
-        cell.alignment = { vertical: 'middle', wrapText: true };
+        cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
     });
 }
 
@@ -183,13 +183,13 @@ export async function GET(req) {
         mainSheet.columns = [
             { width: 5 },   // No
             { width: 30 },  // Perusahaan/Pemilik
-            { width: 14 },  // Bulan
+            { width: 20 },  // Tanggal Tera
             { width: 8 },   // Jumlah
             { width: 10 },  // Satuan
             { width: 22 },  // Kapasitas & Daya Baca
-            { width: 16 },  // UTTP
-            { width: 18 },  // Masa Berlaku
-            { width: 14 },  // Peta
+            { width: 18 },  // UTTP
+            { width: 20 },  // Masa Berlaku
+            { width: 26 },  // Peta
             { width: 18 },  // Keterangan
         ];
 
@@ -205,7 +205,7 @@ export async function GET(req) {
 
         // Header row (Row 3)
         const headerValues = [
-            'No', 'Perusahaan/Pemilik UTTP', 'Bulan', 'Jumlah', 'Satuan',
+            'No', 'Perusahaan/Pemilik UTTP', 'Tanggal Tera', 'Jumlah', 'Satuan',
             'Kapasitas & Daya Baca', 'UTTP', 'Masa Berlaku', 'Peta', 'Keterangan'
         ];
         const headerRow = mainSheet.addRow(headerValues);
@@ -242,7 +242,9 @@ export async function GET(req) {
 
             // Write non-pasar rows individually
             for (const row of nonPasarRows) {
-                const month = getMonthFromDate(row.tglTera);
+                const tglTeraFormatted = row.tglTera
+                    ? new Date(row.tglTera).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })
+                    : '-';
                 const masaBerlaku = row.tglHabisBerlaku
                     ? new Date(row.tglHabisBerlaku).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })
                     : '-';
@@ -252,7 +254,7 @@ export async function GET(req) {
                 const dataRow = mainSheet.addRow([
                     globalNo++,
                     row.namaPemilik || '-',
-                    month ? BULAN_INDO[month] : '-',
+                    tglTeraFormatted,
                     1,
                     'Unit',
                     kapDayaBaca,
@@ -264,19 +266,22 @@ export async function GET(req) {
 
                 applyDataRowBorder(dataRow);
 
-                // Add Google Maps hyperlink
+                // Add Google Maps hyperlink with Kecamatan
                 if (row.latitude && row.longitude) {
                     const petaCell = dataRow.getCell(9);
                     const url = `https://www.google.com/maps?q=${row.latitude},${row.longitude}`;
-                    petaCell.value = { text: 'Lihat Peta', hyperlink: url };
+                    const kec = row.alamatUttp ? `${row.alamatUttp}, ` : '';
+                    petaCell.value = { text: `${kec}Lihat Peta`, hyperlink: url };
                     petaCell.font = { color: { argb: 'FF0563C1' }, underline: true, size: 10 };
                 }
             }
 
             // Write consolidated pasar rows
             for (const [pasarName, rows] of Object.entries(pasarGroups)) {
-                const month = getMonthFromDate(rows[0].tglTera);
                 const firstRow = rows[0];
+                const tglTeraPasar = firstRow?.tglTera
+                    ? new Date(firstRow.tglTera).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })
+                    : '-';
 
                 // Collect into pasarDataMap for detail sheets
                 if (!pasarDataMap[pasarName]) pasarDataMap[pasarName] = [];
@@ -285,7 +290,7 @@ export async function GET(req) {
                 const dataRow = mainSheet.addRow([
                     globalNo++,
                     `Pasar ${pasarName}`,
-                    month ? BULAN_INDO[month] : '-',
+                    tglTeraPasar,
                     rows.length,
                     'Unit',
                     `(Lihat Tab "${sanitizeSheetName(pasarName)}")`,
@@ -297,12 +302,13 @@ export async function GET(req) {
 
                 applyDataRowBorder(dataRow);
 
-                // Add Google Maps hyperlink from first row with coordinates
+                // Add Google Maps hyperlink from first row with coordinates, including Kecamatan
                 const rowWithCoords = rows.find(r => r.latitude && r.longitude);
                 if (rowWithCoords) {
                     const petaCell = dataRow.getCell(9);
                     const url = `https://www.google.com/maps?q=${rowWithCoords.latitude},${rowWithCoords.longitude}`;
-                    petaCell.value = { text: 'Lihat Peta', hyperlink: url };
+                    const kec = rowWithCoords.alamatUttp ? `${rowWithCoords.alamatUttp}, ` : '';
+                    petaCell.value = { text: `${kec}Lihat Peta`, hyperlink: url };
                     petaCell.font = { color: { argb: 'FF0563C1' }, underline: true, size: 10 };
                 }
             }
