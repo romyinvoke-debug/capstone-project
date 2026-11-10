@@ -42,6 +42,22 @@ export const authOptions = {
         })
     ],
     callbacks: {
+        async redirect({ url, baseUrl }) {
+            let safeBase = baseUrl;
+            try {
+                const parsed = new URL(baseUrl);
+                parsed.hostname = parsed.hostname.toLowerCase();
+                if (parsed.hostname.includes('vercelapp') && !parsed.hostname.includes('vercel.app')) {
+                    parsed.hostname = parsed.hostname.replace('vercelapp', 'vercel.app');
+                }
+                safeBase = parsed.origin;
+            } catch {}
+            if (url.startsWith("/")) return `${safeBase}${url}`;
+            try {
+                if (new URL(url).origin === safeBase) return url;
+            } catch {}
+            return safeBase;
+        },
         async jwt({ token, user }) {
             if (user) {
                 const role = (user.role || '').trim().toLowerCase();

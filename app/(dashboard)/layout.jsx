@@ -77,7 +77,10 @@ export default function DashboardLayout({ children }) {
                                 </span>
                             </div>
                             <button
-                                onClick={() => signOut({ callbackUrl: '/login' })}
+                                onClick={async () => {
+                                    await signOut({ redirect: false });
+                                    window.location.href = '/login';
+                                }}
                                 className="px-3 py-1.5 text-sm bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors font-medium"
                             >
                                 <i className="fas fa-sign-out-alt mr-1"></i>Keluar

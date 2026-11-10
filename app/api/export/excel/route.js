@@ -1,4 +1,5 @@
 // File: app/api/export/excel/route.js
+export const dynamic = 'force-dynamic';
 import { db } from '@/lib/db';
 import { dataUttp } from '@/lib/db/schema';
 import { getServerSession } from 'next-auth';
