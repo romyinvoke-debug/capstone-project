@@ -107,6 +107,14 @@ export async function GET(req) {
             return new Response('Unauthorized', { status: 401 });
         }
 
+        // Only admin can export Excel
+        if (session.user?.role !== 'admin') {
+            return new Response(JSON.stringify({ error: 'Forbidden: Hanya admin yang dapat mengekspor data ke Excel' }), {
+                status: 403,
+                headers: { 'Content-Type': 'application/json' },
+            });
+        }
+
         const { searchParams } = new URL(req.url);
         const tahun = parseInt(searchParams.get('tahun') || new Date().getFullYear().toString());
         const bulanParam = searchParams.get('bulan') || '';

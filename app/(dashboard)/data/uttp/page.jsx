@@ -296,18 +296,20 @@ export default function DataUttpPage() {
                             <i className="fas fa-times mr-1"></i>Reset
                         </button>
                     )}
-                    {/* Export Excel Button */}
-                    <button
-                        onClick={handleExportExcel}
-                        disabled={exportLoading}
-                        className="px-4 py-2.5 text-sm text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors font-medium whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                    >
-                        {exportLoading ? (
-                            <><i className="fas fa-spinner fa-spin"></i>Mengekspor...</>
-                        ) : (
-                            <><i className="fas fa-file-excel"></i>Export Excel</>
-                        )}
-                    </button>
+                    {/* Export Excel Button - Admin Only */}
+                    {session?.user?.role === 'admin' && (
+                        <button
+                            onClick={handleExportExcel}
+                            disabled={exportLoading}
+                            className="px-4 py-2.5 text-sm text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors font-medium whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        >
+                            {exportLoading ? (
+                                <><i className="fas fa-spinner fa-spin"></i>Mengekspor...</>
+                            ) : (
+                                <><i className="fas fa-file-excel"></i>Export Excel</>
+                            )}
+                        </button>
+                    )}
                 </div>
             </div>
 
